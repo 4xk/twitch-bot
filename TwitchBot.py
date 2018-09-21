@@ -1,6 +1,7 @@
 import socket, re, os
 import Commands
 from credentials import *
+from colorama import Back,Fore,init,Style
 
 s = socket.socket()
 s.connect(("irc.chat.twitch.tv", 6667))
@@ -47,8 +48,8 @@ while run:
                 else:
                     message = message.replace(prefix, "")
                     message = message.strip()
-                    print("< " + username.title() + ':', prefix + message) # Command
+                    print("< " + Fore.YELLOW + username.title() + ':', prefix + message) # Command
                     response = Commands.handleCommands(username, message)
                     if response != None:
-                        print("> " + response)
+                        print("> " + Fore.GREEN + response)
                         sendMessage(response)

@@ -1,7 +1,6 @@
-import requests
+import requests, json, random, os
 from credentials import *
 from colorama import Back,Fore,init,Style
-import random
 init(autoreset = True, convert = True)
 def handleCommands(username, msg):
 	commands = {
@@ -11,7 +10,7 @@ def handleCommands(username, msg):
 		"hug"		:hug,
 		"thanks"	:thanks,
 		"thank"		:thanks,
-		"points"    :points
+		"points"    :points,
 	}
 	cmd = msg.split()[0]
 	if cmd in commands:
@@ -35,20 +34,26 @@ def roulette(username, msg):
 	try:
 		current_points = 0
 		f = open('data/' + CHAN + '/' + username.title() + '/.points', 'r')
-		bidding = int(msg.split()[1])
 		try:
 			current_points = int(f.read())
 			f.seek(0)
 		except ValueError:
 			return "Something went wrong internally. debug=" + int(f.read())
+		if msg.split()[1] == 'all':
+			bidding = current_points
+		bidding = int(msg.split()[1])
 		f.close()
-		if current_points <= 0:
-			return "Not enough points @" + username
+		if not bidding > 0:
+			return "Amount must be positive @" + username
 		won = random.choice([False,False,True])
 		if won:
+			if not (current_points + bidding) > 0:
+				return "Ending value must be positive @" + username
 			current_points += (bidding)
 			message = 'You won %s points! You now have %s points. @%s' % (bidding, current_points, username)
 		else:
+			if not (current_points + bidding) > 0:
+				return "Ending value must be positive @" + username
 			current_points -= bidding
 			message = 'You lost %s points! You now have %s points. :( @%s' % (bidding, current_points, username)
 		open('data/' + CHAN + '/' + username.title() + '/.points', 'w').close()
@@ -76,4 +81,5 @@ def thanks(username, msg):
 	except IndexError:
    		return "You need to specify who you want to thank! @" + username
 def points(username, msg):
-	return open('data/' + CHAN + '/' + username.title() + '/.points', 'r').read() + ' @' + username
+	return 'You have ' + open('data/' + CHAN + '/' + username.title() + '/.points', 'r').read() + ' points @' + username
+
